@@ -1122,7 +1122,7 @@ DATA.days.forEach(d => {
 });
 
 /* -------- Day selection ---------- */
-function selectDay(dayId){
+function selectDay(dayId, skipScroll){
   currentDay = dayId;
   // tabs
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", parseInt(t.dataset.day)===dayId));
@@ -1131,18 +1131,20 @@ function selectDay(dayId){
   if (dayId === 0) {
     DATA.days.forEach(d => dayLayers[d.id].addTo(map));
     map.fitBounds(overviewGroup.getBounds().pad(.05));
-    document.getElementById("day-0").scrollIntoView({behavior:"smooth", block:"start"});
+    if (!skipScroll) document.getElementById("day-0").scrollIntoView({behavior:"smooth", block:"start"});
   } else {
     dayLayers[dayId].addTo(map);
     const day = DATA.days.find(d=>d.id===dayId);
     const lats = day.track.map(p=>p[0]), lons = day.track.map(p=>p[1]);
     map.fitBounds([[Math.min(...lats), Math.min(...lons)], [Math.max(...lats), Math.max(...lons)]], {padding:[24,24]});
-    document.getElementById("day-"+dayId).scrollIntoView({behavior:"smooth", block:"start"});
+    if (!skipScroll) document.getElementById("day-"+dayId).scrollIntoView({behavior:"smooth", block:"start"});
   }
 }
 
-// Initial render: overview
-selectDay(0);
+// Initial render: overview, but don't scroll past the hero
+selectDay(0, true);
+// Make sure the user lands at the top
+window.scrollTo(0, 0);
 
 // Update tab on scroll
 const sectionEls = ["day-0", ...DATA.days.map(d=>"day-"+d.id)].map(id => document.getElementById(id));
